@@ -1,3 +1,4 @@
+import time
 from tkinter import *
 from tkinter import ttk
 
@@ -21,14 +22,13 @@ params = {
 }
 
 def response_data():
+    btn.config(state=DISABLED)
     response = requests.get(url, params=params)
     response.raise_for_status()
     api_data = response.json()
 
-    # Строим словарь для быстрого поиска по ID
     api_by_id = {coin["id"]: coin for coin in api_data}
 
-    # Заполняем вашу структуру
     for item in crypto_data:
         coin = api_by_id.get(item["ID"])
         if coin:
@@ -42,7 +42,7 @@ def clear_table():
 def insert_table():
     for crypto in crypto_data:
         table.insert("", "end", values=(
-            crypto["symbol"],
+            crypto["symbol"].upper(),
             crypto["name"],
             crypto["current_price_usd"]
         ))
@@ -50,7 +50,9 @@ def insert_table():
 def update_table():
     clear_table()
     response_data()
+    label.config(text=time.strftime("%Y-%m-%d %H:%M:%S"))
     insert_table()
+    btn.config(state=NORMAL)
 
 def resize_columns(event):
     total_width = table.winfo_width()
@@ -61,7 +63,7 @@ def resize_columns(event):
 root = Tk()
 root.title("Курс Криптовалюты")
 
-WIDTH, HEIGHT = 520, 450
+WIDTH, HEIGHT = 520, 300
 screen_w = root.winfo_screenwidth()
 screen_h = root.winfo_screenheight()
 x = (screen_w - WIDTH) // 2
@@ -77,9 +79,16 @@ for col in columns:
 
 table.pack(padx=10, pady=10, fill="both", expand=True)
 
-update_btn = Button(root, text="Обновить курсы", bg="green", command=update_table)
-update_btn.pack(pady=5)
+frame = Frame(root)
+frame.pack(fill=X)
+
+btn = Button(frame, text="Обновить данные", bg="green", command=update_table)
+btn.pack(side=LEFT, padx=5)
+
+label = Label(frame, text="Дата обновления")
+label.pack(side=RIGHT, padx=5)
 
 table.bind("<Configure>", resize_columns)
 
+update_table()
 root.mainloop()
