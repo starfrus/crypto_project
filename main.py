@@ -1,16 +1,47 @@
-# This is a sample Python script.
+from tkinter import *
+from tkinter import ttk
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+crypto_data = [
+    {"ID": "", "symbol": "", "name": "", "image": "", "current_price_usd": 0},
+]
 
+def resize_columns(event):
+    total_width = table.winfo_width()
+    weights = [0.08, 0.30, 0.22, 0.15, 0.25]
+    for col, w in zip(columns, weights):
+        table.column(col, width=int(total_width * w), stretch=True)
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+root = Tk()
+root.title("Курс Криптовалюты")
 
+WIDTH, HEIGHT = 520, 450
+screen_w = root.winfo_screenwidth()
+screen_h = root.winfo_screenheight()
+x = (screen_w - WIDTH) // 2
+y = (screen_h - HEIGHT) // 2
+root.geometry(f"{WIDTH}x{HEIGHT}+{x}+{y}")
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+columns = ("ID", "Название", "Иконка", "Символ", "Цена (USD)")
+table = ttk.Treeview(root, columns=columns, show="headings")
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+for col in columns:
+    table.column(col, anchor=CENTER)
+    table.heading(col, text=col)
+
+for crypto in crypto_data:
+    table.insert("", "end", values=(
+        crypto["ID"],
+        crypto["symbol"],
+        crypto["name"],
+        crypto["image"],
+        crypto["current_price_usd"]
+    ))
+
+table.pack(padx=10, pady=10, fill="both", expand=True)
+
+update_btn = Button(root, text="Обновить курсы", bg="green")
+update_btn.pack(pady=5)
+
+table.bind("<Configure>", resize_columns)
+
+root.mainloop()
