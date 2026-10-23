@@ -37,6 +37,23 @@ def response_data():
             item["image"] = coin["image"]
             item["current_price_usd"] = coin["current_price"]
 
+def clear_table():
+    table.delete(*table.get_children())
+
+def insert_table():
+    for crypto in crypto_data:
+        table.insert("", "end", values=(
+            crypto["ID"],
+            crypto["symbol"],
+            crypto["name"],
+            crypto["image"],
+            crypto["current_price_usd"]
+        ))
+
+def update_table():
+    clear_table()
+    response_data()
+    insert_table()
 
 def resize_columns(event):
     total_width = table.winfo_width()
@@ -63,7 +80,7 @@ for col in columns:
 
 table.pack(padx=10, pady=10, fill="both", expand=True)
 
-update_btn = Button(root, text="Обновить курсы", bg="green")
+update_btn = Button(root, text="Обновить курсы", bg="green", command=update_table)
 update_btn.pack(pady=5)
 
 table.bind("<Configure>", resize_columns)
